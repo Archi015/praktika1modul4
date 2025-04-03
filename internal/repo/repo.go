@@ -4,6 +4,7 @@ import (
 	"Service/internal/models"
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"log"
 )
 
 // Слой репозитория, здесь должны быть все методы, связанные с базой данных
@@ -44,6 +45,7 @@ func NewUserRepository(pool *pgxpool.Pool) User {
 func (u *userRepository) Register(ctx context.Context, user models.Users) error {
 	_, err := u.pool.Exec(ctx, createUserQuery, user.Username, user.Password, user.Email)
 	if err != nil {
+		log.Printf("Error register user: %v", err)
 		return err
 	}
 	return nil
@@ -53,6 +55,7 @@ func (u *userRepository) CheckExists(ctx context.Context, user models.Users) boo
 	var username string
 	_ = u.pool.QueryRow(ctx, checkExistsQuery, user.Username, user.Email).Scan(&username)
 	if username == "" {
+		log.Printf("User %s does not exist", user.Username)
 		return true
 	}
 
@@ -63,6 +66,7 @@ func (u *userRepository) Login(ctx context.Context, user models.Users) (bool, er
 	var active bool
 	err := u.pool.QueryRow(ctx, loginQuery, user.Username, user.Password).Scan(&active)
 	if err != nil {
+		log.Printf("Error login or password: %v", err)
 		return false, err
 	}
 

@@ -26,7 +26,6 @@ func (s *AuthHandler) Register(ctx context.Context, req *auth.RegisterRequest) (
 	var user models.Users
 	user.Username = req.GetUsername()
 	user.Password = req.GetPassword()
-	//user.Email = req.GetEmail()
 
 	err := s.user.Register(ctx, user)
 	if err != nil {
